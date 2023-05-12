@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The LineageOS Project
+ * Copyright (C) 2019-2022 OctaviOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,29 +18,33 @@ package com.android.settings.deviceinfo.yukiprjkt;
 
 import android.content.Context;
 import android.os.SystemProperties;
-import android.text.TextUtils;
-
-import androidx.preference.Preference;
 
 import com.android.settings.R;
 import com.android.settings.core.BasePreferenceController;
 
-public class YukiMaintainerPreferenceController extends BasePreferenceController {
+public class AboutDeviceNamePreferenceController extends BasePreferenceController {
 
-    private static final String TAG = "YukiMaintainerPreferenceController";
-    private static final String ROM_PROPERTY = "ro.yukiprjkt.maintainer";
+    private static final String TAG = "AboutDeviceNameCtrl";
 
-    public YukiMaintainerPreferenceController(Context context, String key) {
+    private static final String KEY_DEVICE_NAME_PROP = "ro.product.device";
+    private static final String KEY_DEVICE_MODEL_PROP = "ro.product.model";
+
+    public AboutDeviceNamePreferenceController(Context context, String key) {
         super(context, key);
     }
 
+    @Override
     public int getAvailabilityStatus() {
         return AVAILABLE;
     }
 
+    @Override
     public CharSequence getSummary() {
-        String rom = SystemProperties.get(ROM_PROPERTY,
-                this.mContext.getString(R.string.device_info_default));
-        return rom;
+	String deviceName = SystemProperties.get(KEY_DEVICE_NAME_PROP);
+	String deviceModel =  SystemProperties.get(KEY_DEVICE_MODEL_PROP);
+	if (!deviceName.isEmpty() && !deviceModel.isEmpty())
+	    return deviceName + " (" + deviceModel + ")";
+	else
+            return mContext.getString(R.string.unknown);
     }
 }

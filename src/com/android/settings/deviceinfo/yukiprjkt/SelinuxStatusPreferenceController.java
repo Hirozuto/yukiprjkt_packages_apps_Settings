@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The LineageOS Project
+ * Copyright (C) 2017 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,30 +17,35 @@
 package com.android.settings.deviceinfo.yukiprjkt;
 
 import android.content.Context;
-import android.os.SystemProperties;
-import android.text.TextUtils;
-
-import androidx.preference.Preference;
+import android.os.SELinux;
 
 import com.android.settings.R;
 import com.android.settings.core.BasePreferenceController;
 
-public class YukiMaintainerPreferenceController extends BasePreferenceController {
+public class SelinuxStatusPreferenceController extends BasePreferenceController {
 
-    private static final String TAG = "YukiMaintainerPreferenceController";
-    private static final String ROM_PROPERTY = "ro.yukiprjkt.maintainer";
+    private static final String TAG = "SelinuxStatusCtrl";
 
-    public YukiMaintainerPreferenceController(Context context, String key) {
+    private String mStatus;
+
+    public SelinuxStatusPreferenceController(Context context, String key) {
         super(context, key);
     }
 
+    @Override
     public int getAvailabilityStatus() {
-        return AVAILABLE;
+        return mContext.getResources().getBoolean(R.bool.config_show_selinux_status)
+                ? AVAILABLE : UNSUPPORTED_ON_DEVICE;
     }
 
+    @Override
     public CharSequence getSummary() {
-        String rom = SystemProperties.get(ROM_PROPERTY,
-                this.mContext.getString(R.string.device_info_default));
-        return rom;
+        int stringId = R.string.selinux_status_disabled;
+        if (SELinux.isSELinuxEnabled()) {
+            stringId = SELinux.isSELinuxEnforced()
+                    ? R.string.selinux_status_enforcing
+                    : R.string.selinux_status_permissive;
+        }
+        return mContext.getString(stringId);
     }
 }
